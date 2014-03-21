@@ -23,14 +23,14 @@ module Guard
 				end
 
 				def destroy
-					::Guard::UI.info("Guard::Rake::Vagrant is stopping")
+					::Guard::UI.info("Guard::Rake::Vagrant box is stopping")
 					cmd = Mixlib::ShellOut.new("vagrant destroy -f")
 					cmd.live_stream = STDOUT
 					cmd.run_command
 					begin
 						cmd.error!
 					rescue Mixlib::ShellOut::ShellCommandFailed => e
-						::Guard::UI.info("Vagrant BOX failed #{e.to_s}")
+						::Guard::UI.info("Vagrant box failed #{e.to_s}")
 						throw :task_has_failed
 					ensure
 						# Sometimes, we leave the occasional shell process unreaped!
@@ -39,19 +39,23 @@ module Guard
 				end
 
 				def provision
-					# Box is running?
-					UI.info "Guard::Vagrant provision"
+					UI.info "Guard::Rake::Vagrant box is provisioning"
 					cmd = Mixlib::ShellOut.new("vagrant provision", :timeout => 10800)
 					cmd.live_stream = STDOUT
 					cmd.run_command
 
 					begin
 						cmd.error!
-						Notifier.notify('Vagrant provisioned', :title => 'guard-vagrant', :image => :success)
+						Notifier.notify('Vagrant box provisioned', :title => 'guard-vagrant', :image => :success)
 					rescue Mixlib::ShellOut::ShellCommandFailed => e
-						Notifier.notify('Vagrant provision failed', :title => 'guard-vagrant', :image => :failed)
-						::Guard::UI.info("Vagrant provision failed with #{e.to_s}")
+						Notifier.notify('Vagrant box provision failed', :title => 'guard-vagrant', :image => :failed)
+						::Guard::UI.info("Vagrant box provision failed with #{e.to_s}")
 						throw :task_has_failed
+					end
+
+					if cmd.stdout =~ /VM is not currently running/
+						UI.info "Guard::Rake::Vagrant box is not running"
+						self.up
 					end
 				end
 			end
