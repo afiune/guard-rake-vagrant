@@ -17,24 +17,24 @@ module Guard
 						Notifier.notify('Vagrant box created', :title => 'guard-rake-vagrant', :image => :success)
 					rescue Mixlib::ShellOut::ShellCommandFailed => e
 						Notifier.notify('Vagrant box create failed', :title => 'guard-rake-vagrant', :image => :failed)
-						::Guard::UI.info("Vagrant box failed with #{e.to_s}")
+						UI.info("Vagrant box failed with #{e.to_s}")
 						throw :task_has_failed
 					end
 				end
 
 				def destroy
-					::Guard::UI.info("Guard::Rake::Vagrant box is stopping")
-					cmd = Mixlib::ShellOut.new("vagrant destroy -f")
+					UI.info("Guard::Rake::Vagrant box is stopping")
+					cmd = Mixlib::ShellOut.new("vagrant destroy -f", :timeout => 300)
 					cmd.live_stream = STDOUT
 					cmd.run_command
+
 					begin
 						cmd.error!
+						Notifier.notify('Vagrant box destroyed', :title => 'guard-rake-vagrant', :image => :success)
 					rescue Mixlib::ShellOut::ShellCommandFailed => e
-						::Guard::UI.info("Vagrant box failed #{e.to_s}")
+						Notifier.notify('Vagrant box destroy failed', :title => 'guard-rake-vagrant', :image => :failed)
+						UI.info("Vagrant box failed #{e.to_s}")
 						throw :task_has_failed
-					ensure
-						# Sometimes, we leave the occasional shell process unreaped!
-						Process.waitall
 					end
 				end
 
@@ -49,7 +49,7 @@ module Guard
 						Notifier.notify('Vagrant box provisioned', :title => 'guard-vagrant', :image => :success)
 					rescue Mixlib::ShellOut::ShellCommandFailed => e
 						Notifier.notify('Vagrant box provision failed', :title => 'guard-vagrant', :image => :failed)
-						::Guard::UI.info("Vagrant box provision failed with #{e.to_s}")
+						UI.info("Vagrant box provision failed with #{e.to_s}")
 						throw :task_has_failed
 					end
 

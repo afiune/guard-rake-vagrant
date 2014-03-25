@@ -42,6 +42,7 @@ module Guard
     end
 
     def run_all
+      ::Guard::Rake::Vagrant.provision
       run_rake_task if @options[:run_on_all]
     end
 
