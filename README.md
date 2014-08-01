@@ -7,7 +7,7 @@ Software & Tools
 ------------
 
 This gem depends on the well installation of the following software & tools:
-* Vagrant - Recomended version 1.2.2 - http://downloads.vagrantup.com/tags/v1.2.2
+* Vagrant
 * Vagrant Plugins
   * vagrant-berkshelf (1.3.7)
   * vagrant-windows (1.5.1)
